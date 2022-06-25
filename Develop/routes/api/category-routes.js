@@ -60,14 +60,30 @@ router.put('/:id', async (req, res) => {
       },
     });
     //returning catData doesn't return a useful piece of data (the number of rows effect is always 1 in this scenario), so I created a custom message for visual appeal
-    res.status(200).json({ message: `Successfully updated category at id: ${req.params.id} to be "${req.body.category_name}".`});
+    res.status(200).json({ message: `Successfully updated category with id: ${req.params.id} to be "${req.body.category_name}".`});
   } catch (err) {
     res.status(400).json(err);
   }
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete a category by its `id` value
+  try {
+    const catData = await Category.destroy({
+      where: {
+        id: req.params.id,
+      },
+    });
+
+    if (!catData) {
+      res.status(404).json({ message: 'No category found with that id!' });
+      return;
+    }
+
+    res.status(200).json({ message: `Successfully deleted category with id: ${req.params.id}.`});
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 module.exports = router;
