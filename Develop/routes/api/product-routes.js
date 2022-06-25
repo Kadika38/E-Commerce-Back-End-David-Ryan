@@ -112,8 +112,28 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
+  //start by checking to make sure the id is correct
+  try {
+    const prodData = await Product.findByPk(req.params.id);
+    if (!prodData) {
+      res.status(404).json({ message: 'No product found with that ID'});
+      return;
+    }
+    //delete product-tags attached to the product
+    //first find the attached product-tags
+    const prodTags = await ProductTag.findAll({ where: { product_id: req.params.id } });
+    const prodTagsToRemove = prodTags.map(({ id }) => id);
+    //then delete both the attached product-tags and the product itself (took this idea from the prewritten put route - thanks!)
+    return Promise.all([
+      ProductTag.destroy({ where: { id: prodTagsToRemove} }),
+      Product.destroy({ where: { id: req.params.id } })
+    ])
+    .then(res.status(200).json({ message: `Succesfully deleted product with id: ${req.params.id}!`}));
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 module.exports = router;
