@@ -48,8 +48,22 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', async (req, res) => {
   // update a tag's name by its `id` value
+  try {
+    const tagData = await Tag.update({
+      tag_name: req.body.tag_name,
+    },
+    {
+      where: {
+        id: req.params.id,
+      },
+    });
+    //returning tagData doesn't return a useful piece of data (the number of rows effect is always 1 in this scenario), so I created a custom message for visual appeal
+    res.status(200).json({ message: `Successfully updated category at id: ${req.params.id} to be ${req.body.tag_name}.`});
+  } catch (err) {
+    res.status(400).json(err);
+  }
 });
 
 router.delete('/:id', (req, res) => {

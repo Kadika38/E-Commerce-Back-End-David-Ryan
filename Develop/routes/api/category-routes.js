@@ -59,7 +59,8 @@ router.put('/:id', async (req, res) => {
         id: req.params.id,
       },
     });
-    res.status(200).json({ message: `Successfully updated category at id: ${req.params.id} to be ${req.body.category_name}.`});
+    //returning catData doesn't return a useful piece of data (the number of rows effect is always 1 in this scenario), so I created a custom message for visual appeal
+    res.status(200).json({ message: `Successfully updated category at id: ${req.params.id} to be "${req.body.category_name}".`});
   } catch (err) {
     res.status(400).json(err);
   }
